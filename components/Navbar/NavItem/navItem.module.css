@@ -1,0 +1,51 @@
+.navItem {
+    @apply inline-flex
+      items-center
+      gap-2
+      rounded
+      px-3
+      py-2;
+  
+    .label {
+      @apply text-sm
+        font-medium
+        leading-5;
+    }
+  
+    .icon {
+      @apply size-3
+        text-neutral-500
+        dark:text-neutral-200;
+    }
+  
+    &.nav {
+      .label {
+        @apply text-white;
+      }
+  
+      &.active {
+        @apply bg-lime-500;
+  
+        .label {
+          @apply text-black;
+        }
+  
+        .icon {
+          @apply text-white
+            opacity-50;
+        }
+      }
+    }
+  
+    &.footer {
+      .label {
+        @apply text-neutral-800
+          dark:text-white;
+      }
+  
+      &:hover {
+        @apply bg-neutral-100 dark:bg-neutral-900;
+      }
+    }
+  }
+  

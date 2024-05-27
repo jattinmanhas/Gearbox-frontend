@@ -1,0 +1,75 @@
+.signupContainer {
+    @apply flex
+    justify-center
+    w-screen h-screen
+  }
+
+  .signupDesign{
+    @apply w-2/5
+    bg-black
+     h-full
+  }
+
+  .signupDesign img{
+    @apply block h-full
+  }
+  
+  .signupForm {
+    @apply w-3/5
+      flex
+      flex-col
+      justify-center
+      ml-10
+      mr-5
+  }
+  
+  .signupInput {
+    @apply block
+      p-2
+      mb-4
+      w-full
+      rounded-lg
+      bg-inherit
+      border
+      border-l-zinc-50
+      focus:outline-lime-500 transition-all ease-in-out;
+  }
+  
+  .signupLabel {
+    @apply pb-2;
+  }
+  
+  .signupHeadingContainer {
+    @apply pb-2 mb-4
+      border-b;
+  }
+  
+  .signupHeadingContainer > h1 {
+    @apply text-3xl
+      leading-normal
+      font-semibold;
+  }
+
+  .signupEmailContainer{
+    @apply flex w-full
+  }
+
+  .signupRequired{
+    @apply text-red-500
+  }
+
+  .signupEmail{
+    @apply flex flex-col w-1/2
+  }
+
+  .signupUsername{
+    @apply flex flex-col w-1/2 ml-2
+  }
+  
+  .loginAsk p{
+    @apply text-center mt-2
+  }
+    
+  .loginAsk span{
+    @apply text-lime-500
+  }
