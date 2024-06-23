@@ -1,6 +1,8 @@
 .container {
-  @apply border-neutral-900
-    bg-neutral-950
+  @apply border-neutral-200
+    bg-white
+    dark:border-neutral-900
+    dark:bg-neutral-900
     lg:flex
     lg:h-16
     lg:flex-row
@@ -34,7 +36,8 @@
 
 .appIconWrapper {
   @apply w-[30px]
-    flex-1;
+    flex-1
+    dark:text-white
 }
 
 .navInteractionIcon {

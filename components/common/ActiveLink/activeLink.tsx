@@ -23,6 +23,7 @@ const ActiveLink: FC<ActiveLinkProps> = ({
         href.toString() === pathname,
     })
 
+
     return (
         <Link className={finalClassName} href={href} {...props}>
             {children}

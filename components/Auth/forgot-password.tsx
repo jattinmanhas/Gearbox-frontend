@@ -1,42 +1,45 @@
 "use client";
-import Link from "next/link";
 import styles from "./forgot-password.module.css";
-import { forgotPassword } from "@/api/auth";
 import LimeButton from "../Button/limeButton";
 import { useFormState } from "react-dom";
 import ErrorMessage from "../common/ErrorMessage";
+import { FC } from "react";
 
 const inititalState = {
-  status : 500,
-  message : ''
+  status: 500,
+  message: "",
+};
+
+type ForgotPasswordFunction = (prevState: any, formData: FormData) => Promise<{status: number; message: string}>
+
+type Props = {
+  action : ForgotPasswordFunction
 }
 
-const ForgotPasswordForm = () => {
-  const [state, formAction] = useFormState(forgotPassword, inititalState)
+const ForgotPasswordForm: FC<Props> = ({action}: Props) => {
+  const [state, formAction] = useFormState(action, inititalState);
 
   return (
-      <div className={styles.forgotPasswordContainer}>
-        {(state.message && state.status !== 200) && <ErrorMessage message={state.message} /> }
-        <div className={styles.forgotPassswordHeadingContainer}>
-          <h1>Forgot Your Password?</h1>
-          <p>Enter email address assoicated with your account and we will send you link to reset your password.</p>
+    <div className={styles.forgotPasswordContainer}>
+      {(state.message && state.status !== 200) && <ErrorMessage message={state.message} /> }
+      <form action={formAction}>
+        <div>
+          <div className={styles.InputContainer}>
+            <label className={styles.loginLabel}>Email Address</label>
+            <input
+              id="email"
+              type="text"
+              name="email"
+              className={styles.loginInput}
+              placeholder="johndoe@example.com"
+            />
+          </div>
+          <div>
+            <LimeButton type="submit" name="Send Reset Email" />
+          </div>
         </div>
-        <form className={styles.forgotPasswordForm} action={formAction}>
-          <label className={styles.forgotPasswordLabel} htmlFor="email">
-            Email
-          </label>
-          <input
-            className={styles.forgotPasswordInput}
-            id="email"
-            name="email"
-            type="text"
-          />
-
-          <LimeButton name="Continue" type="submit" />
-
-        </form>
-        <Link href="/signup"> <p className="text-center mt-2">Don&apos;t have and account? <span className="text-lime-500">Sign up</span></p></Link>
-      </div>
+      </form>
+    </div>
   );
 };
 

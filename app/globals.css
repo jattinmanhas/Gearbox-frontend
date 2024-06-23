@@ -17,16 +17,13 @@
 }
 
 body {
-    margin: 0;
-    padding: 0;
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      hsl(var(--background-end-rgb))
-    )
-    hsl(var(--background-start-rgb));
-}
+  margin: 0;
+  padding: 0;
+  display: flex;
+  color: white;
+  background-color: rgb(35, 35, 35);
+  flex-direction: column;
+} 
 
 @layer utilities {
   .text-balance {
@@ -43,5 +40,5 @@ body {
 }
 
 .not-found-message {
-  @apply text-xl mb-2;
+  @apply text-xl mb-2 ;
 }

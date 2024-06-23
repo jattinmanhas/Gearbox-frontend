@@ -16,6 +16,7 @@ const NavItem: FC<PropsWithChildren<NavItemProps>> = ({
   type = "nav",
   children,
 }) => {
+  console.log(classNames(styles.navItem, styles[type]))
   return (
     <>
       <ActiveLink

@@ -2,9 +2,11 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    './pages/**/*.{tsx,mdx}',
+    './components/**/*.tsx',
+    './providers/**/*.tsx',
+    './layouts/**/*.tsx',
+    './app/**/*.tsx',
   ],
   theme: {
     extend: {
@@ -12,9 +14,10 @@ const config: Config = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+
       },
       colors : {
-        "card-background" : '#252525',
+        "card-background" : '#212121',
       }
     },
   },

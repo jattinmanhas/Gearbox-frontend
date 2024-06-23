@@ -32,8 +32,8 @@ interface resetPassswordUser {
 
 const url = "http://localhost:5000/admin/";
 
-export async function login(prevState: any, formData: FormData) {
-  const username: string = formData.get("usernameEmail") as string;
+export async function login(prevState: any, formData: FormData): Promise<{status: number; message:string;}>{
+  const username: string = formData.get("email") as string;
   const password: string = formData.get("password") as string;
 
   if (!username || !password) {
@@ -52,17 +52,11 @@ export async function login(prevState: any, formData: FormData) {
 
   try {
     const response = await axios.post(loginUrl, data);
-
-    if (response.status === 200) {
-      return {
-        status: 200,
-        message: response.data.message as string,
-      };
-    }
+    console.log(response);
 
     return {
-      status: 400,
-      message: response.data.message as string,
+      status: response.data.statusCode,
+      message: response.data.message,
     };
   } catch (error: any) {
     if (error.response) {
@@ -73,7 +67,7 @@ export async function login(prevState: any, formData: FormData) {
     } else {
       // Handle the case where error.response is undefined
       return {
-        status: 500, // or any default status code you prefer
+        status: 500,
         message: 'Server is not responding. Please try again later.',
       };
     }
@@ -134,7 +128,7 @@ export async function signup(prevState: any, formData: FormData) {
 
 }
 
-export async function forgotPassword(prevState: any, formData: FormData) {
+export async function forgotPassword(prevState: any, formData: FormData): Promise<{status: number; message:string;}> {
   const email: string = formData.get("email") as string;
 
   if (!email) {
@@ -152,12 +146,6 @@ export async function forgotPassword(prevState: any, formData: FormData) {
 
   try {
     const response = await axios.post(forgotPasswordUrl, data);
-    if (response.status === 200) {
-      return {
-        status: 200,
-        message: response.data.message,
-      };
-    }
 
     return {
       status: response.status,
@@ -172,7 +160,7 @@ export async function forgotPassword(prevState: any, formData: FormData) {
     } else {
       // Handle the case where error.response is undefined
       return {
-        status: 500, // or any default status code you prefer
+        status: 500,
         message: 'Server is not responding. Please try again later.',
       };
     }
