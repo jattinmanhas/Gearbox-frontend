@@ -6,16 +6,26 @@ import { useFormState } from "react-dom";
 import ErrorMessage from "../common/ErrorMessage";
 import { FC, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { userStore } from "@/store/user";
+import { User } from "@/store/user"
 
 const initialState = {
   status: 500,
   message: "",
+  user: null
 };
+
+type UserResponse =  {
+  id: number;
+  username: string;
+  email: string;
+  name: string;
+}
 
 type LoginFunction = (
   prevState: any,
   formData: FormData
-) => Promise<{ status: number; message: string }>;
+) => Promise<{ status: number; message: string; user: UserResponse | null}>;
 
 type Props = {
   action: LoginFunction;
@@ -24,13 +34,15 @@ type Props = {
 const Login: FC<Props> = ({ action }: Props) => {
   const [state, formAction] = useFormState(action, initialState);
   const router = useRouter();
+  const { setUser } = userStore();
 
   useEffect(() => {
     if (state.status === 200) {
+      setUser(state.user as User)
       router.push("/");
     }
-  }, [state, router]);
-
+  }, [state, setUser, router]);
+  
   return (
     <div className={styles.loginFormContainer}>
       <form action={formAction}>

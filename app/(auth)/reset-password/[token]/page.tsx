@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { verifyResetToken } from '@/api/auth';
 import ResetPassword from '@/components/Auth/reset-password';
+import Loader from '@/components/common/Loader';
 
 const ResetPasswordPage = () => {
   const router = useRouter();
@@ -38,13 +39,14 @@ const ResetPasswordPage = () => {
   
 
   if(isValid === null){
-    return <div>Loading...</div>;
+    return (
+      <Loader />
+    );
   }
 
   if(!isValid){
     throw new Error(errorMessage)
   }
-
 
   return (
     <div>

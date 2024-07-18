@@ -1,102 +1,159 @@
 "use client";
 import Link from "next/link";
-import styles from "./signup.module.css";
-import { signup } from "@/api/auth";
 import LimeButton from "../Button/limeButton";
 import { useFormState } from "react-dom";
 import ErrorMessage from "../common/ErrorMessage";
-import Image from "next/image";
+import {FC, useEffect} from 'react';
+import { useRouter } from "next/navigation";
 
 const initialState = {
-  status: 200,
-  message: ""
+  status: 500,
+  message: "",
+};
+
+type SignupForm = (prevState: any, formData: FormData) => Promise<{status: number; message: string}>
+
+type Props = {
+  action : SignupForm
 }
 
-const SignUp = () => {
-  const [state, formAction] = useFormState(signup, initialState);
+const SignUp:FC<Props> = ({action}: Props) => {
+  const [state, formAction] = useFormState(action, initialState);
+  const router = useRouter();
 
+  useEffect(() => {
+    if (state.status === 200) {
+      router.push("/login");
+    }
+  }, [state, router]);
+  
   return (
-    <div className={styles.signupContainer}>
-      <div className={styles.signupDesign}>
-        <img src="/images/signupdesign.jpeg" alt="Sign Up Image" />
+    <form action={formAction} className="mt-2 grid grid-cols-6 gap-4">
+      <div className="col-span-6">
+      
+      {(state.message && state.status !== 200) && <ErrorMessage message={state.message} /> }
       </div>
-      <div className={styles.signupForm}>
+      <div className="col-span-6 sm:col-span-3">
+        <label
+          htmlFor="FirstName"
+          className="block text-sm font-medium text-gray-200"
+        >
+          First Name
+        </label>
 
-        <div className={styles.signupHeadingContainer}>
-        {(state.message && state.status !== 200) && <ErrorMessage message={state.message} /> }
-          <h1>Create a new account</h1>
-          <p>Create Your account with Us.</p>
-        </div>
-
-        <form action={formAction}>
-          <div className={styles.signupEmailContainer}>
-            <div className={styles.signupEmail}>
-              <label className={styles.signupLabel} htmlFor="email">
-                Email <span className={styles.signupRequired}>*</span>
-              </label>
-              <input
-                className={styles.signupInput}
-                id="email"
-                name="email"
-                type="text"
-              />
-            </div>
-
-            <div className={styles.signupUsername}>
-              <label className={styles.signupLabel} htmlFor="username">
-                Username <span className={styles.signupRequired}>*</span>
-              </label>
-              <input
-                className={styles.signupInput}
-                id="username"
-                name="username"
-                type="text"
-              />
-            </div>
-          </div>
-          <label className={styles.signupLabel} htmlFor="fullname">
-            Full Name
-          </label>
-          <input
-            className={styles.signupInput}
-            id="fullname"
-            name="fullname"
-            type="text"
-          />
-
-          <label className={styles.signupLabel} htmlFor="password">
-            Password <span className={styles.signupRequired}>*</span>
-          </label>
-          <input
-            className={styles.signupInput}
-            id="password"
-            name="password"
-            type="password"
-          />
-
-          <label className={styles.signupLabel} htmlFor="mobileno">
-            Mobile No.
-          </label>
-          <input
-            className={styles.signupInput}
-            id="mobileno"
-            name="mobileno"
-            type="number"
-          />
-
-          <LimeButton name="Sign Up" type="submit" />
-        </form>
-        <div className={styles.loginAsk}>
-        <Link href="/login">
-          {" "}
-          <p>
-            Already have an account?{" "}
-            <span>Login</span>
-          </p>
-        </Link>
-        </div>
+        <input
+          type="text"
+          id="FirstName"
+          name="first_name"
+          className="mt-1 w-full rounded-md text-sm p-2 bg-inherit border border-l-zinc-50 focus:outline-lime-500"
+        />
       </div>
-    </div>
+
+      <div className="col-span-6 sm:col-span-3">
+        <label
+          htmlFor="LastName"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Last Name
+        </label>
+
+        <input
+          type="text"
+          id="LastName"
+          name="last_name"
+          className="mt-1 w-full rounded-md text-sm p-2 bg-inherit border border-l-zinc-50 focus:outline-lime-500"
+        />
+      </div>
+
+      <div className="col-span-6">
+        <label
+          htmlFor="Email"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Email <span className="text-red-500">*</span>
+        </label>
+
+        <input
+          type="email"
+          id="Email"
+          name="email"
+          className="mt-1 w-full rounded-md text-sm p-2 bg-inherit border border-l-zinc-50 focus:outline-lime-500"
+        />
+      </div>
+
+      <div className="col-span-6">
+        <label
+          htmlFor="username"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Username <span className="text-red-500">*</span>
+        </label>
+
+        <input
+          type="text"
+          id="username"
+          name="username"
+          className="mt-1 w-full rounded-md text-sm p-2 bg-inherit border border-l-zinc-50 focus:outline-lime-500"
+        />
+      </div>
+
+      <div className="col-span-6">
+        <label
+          htmlFor="Password"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Password <span className="text-red-500">*</span>
+        </label>
+
+        <input
+          type="password"
+          id="Password"
+          name="password"
+          className="mt-1 w-full rounded-md text-sm p-2 bg-inherit border border-l-zinc-50 focus:outline-lime-500"
+        />
+      </div>
+
+      <div className="col-span-6">
+        <label
+          htmlFor="MobileNumber"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Mobile Number
+        </label>
+
+        <input
+          type="number"
+          id="MobileNumber"
+          name="mobileNo"
+          className="mt-1 w-full rounded-md text-sm p-2 bg-inherit border border-l-zinc-50 focus:outline-lime-500"
+        />
+      </div>
+
+      <div className="col-span-6">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          By creating an account, you agree to our 
+          <a href="#" className="text-gray-700 underline dark:text-gray-200">
+            &nbsp;terms and conditions&nbsp;
+          </a>
+          and
+          <a href="#" className="text-gray-700 underline dark:text-gray-200">
+            &nbsp;privacy policy&nbsp;
+          </a>
+          .
+        </p>
+      </div>
+
+      <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
+        <LimeButton type="submit" name="Create an Account" />
+        <p className="mt-4 text-sm text-gray-500 sm:mt-0 dark:text-gray-400 text-center">
+          Already have an account?
+          <Link href="/login" className="text-gray-700 underline dark:text-gray-200">
+          &nbsp;Log in
+          </Link>
+          .
+        </p>
+      </div>
+    </form>
   );
 };
 

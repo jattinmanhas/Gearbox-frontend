@@ -4,8 +4,11 @@ import Hamburger from '@heroicons/react/24/solid/Bars3Icon';
 import XMark from '@heroicons/react/24/solid/XMarkIcon';
 import LimeButton from "../Button/limeButton";
 import styles from "./navbar.module.css";
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import NavItem from "./NavItem/navItem";
+import { userStore } from "@/store/user";
+import { Dropdown } from "../common/Dropdown";
+import { getUserDetails } from "@/api/auth";
 
 const navInteractionIcons = {
   show: <Hamburger className={styles.navInteractionIcon} />,
@@ -24,8 +27,28 @@ type NavbarProps = {
 export const Navbar: FC<NavbarProps> = ({
   navItems
 }) => {
+  const {user, setUser} = userStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUser, setIsUser] = useState(user !== null);
   // console.log(navItems)
+
+  // useEffect(() => {
+  //   if (!user) {
+  //     // setLoading(true);
+  //     const setUserInNavbar = async () => {
+  //       try {
+  //         const userDetails = await getUserDetails();
+  //         // setUser(userDetails);
+  //       } catch (err) {
+  //         // setError(err.message);
+  //       } finally {
+  //         // setLoading(false);
+  //       }
+  //     };
+
+  //     setUserInNavbar();
+  //   }
+  // }, [user, setUser]);
 
   return (
     <nav className={styles.container}>
@@ -50,9 +73,12 @@ export const Navbar: FC<NavbarProps> = ({
         </div>
 
         <div className={styles.actionsWrapper}>
-          <Link href="/signup">
+          {user ? <Dropdown username={user.username} /> : <Link href="/signup">
             <LimeButton type="button" name="Sign Up" />
-          </Link>
+          </Link>}
+          {/* <Link href="/signup">
+            <LimeButton type="button" name="Sign Up" />
+            </Link> */}
         </div>
 
       </div>

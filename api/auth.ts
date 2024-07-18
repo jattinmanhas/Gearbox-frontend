@@ -8,6 +8,13 @@ interface loginUser {
   password: string;
 }
 
+type UserResponse =  {
+  id: number;
+  username: string;
+  email: string;
+  name: string;
+}
+
 interface signupUser {
   email: string;
   name?: string;
@@ -30,9 +37,15 @@ interface resetPassswordUser {
   confirmPassword: string;
 }
 
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:5000', // Your API base URL
+  withCredentials: true, // Send cookies with requests
+	headers: {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+});
+
 const url = "http://localhost:5000/admin/";
 
-export async function login(prevState: any, formData: FormData): Promise<{status: number; message:string;}>{
+export async function login(prevState: any, formData: FormData): Promise<{status: number; message:string; user: UserResponse | null; }>{
   const username: string = formData.get("email") as string;
   const password: string = formData.get("password") as string;
 
@@ -40,10 +53,9 @@ export async function login(prevState: any, formData: FormData): Promise<{status
     return {
       status: 400,
       message: "Username/Email or Password cannot be empty",
+      user: null
     };
   }
-
-  const loginUrl = `${url}login`;
 
   const data: loginUser = {
     username: username,
@@ -51,35 +63,45 @@ export async function login(prevState: any, formData: FormData): Promise<{status
   };
 
   try {
-    const response = await axios.post(loginUrl, data);
-    console.log(response);
+    const response = await axiosInstance.post('/admin/login', data);
+    console.log(response.data.data.userdata)
 
     return {
       status: response.data.statusCode,
       message: response.data.message,
-    };
+      user : {
+        id : response.data.data.userdata.id,
+        username: response.data.data.userdata.username,
+        email: response.data.data.userdata.email,
+        name: response.data.data.userdata.name
+      }
+    }; 
+    
   } catch (error: any) {
     if (error.response) {
       return {
         status: error.response.status,
         message: error.response.data.message,
+        user: null
       };
     } else {
       // Handle the case where error.response is undefined
       return {
         status: 500,
         message: 'Server is not responding. Please try again later.',
+        user: null
       };
     }
   }
 }
 
-export async function signup(prevState: any, formData: FormData) {
+export async function signup(prevState: any, formData: FormData): Promise<{status: number; message: string}> {
   const email: string = formData.get("email") as string;
   const username: string = formData.get("username") as string;
   const password: string = formData.get("password") as string;
-  const name: string = formData.get("fullname") as string;
-  const mobileno: string = formData.get("mobileno") as string;
+  const first_name: string = formData.get("first_name") as string;
+  const last_name: string = formData.get("last_name") as string;
+  const mobileno: string = formData.get("mobileNo") as string;
 
   if (!email || !username || !password) {
     return {
@@ -93,29 +115,22 @@ export async function signup(prevState: any, formData: FormData) {
     email: email,
     username: username,
     password: password,
-    name: name,
+    name: first_name + " " + last_name,
     mobileNo: mobileno,
   };
 
   try {
     const response = await axios.post(signupUrl, data);
-    console.log(response)
-    if (response.status === 200) {
-      return {
-        status: 200,
-        message: response.data.message as string,
-      };
-    }
 
     return {
-      status: 400,
-      message: response.data.message as string,
+      status: response.data.statusCode,
+      message: response.data.message,
     };
   } catch (error: any) {
     if (error.response) {
       return {
         status: error.response.status,
-        message: error.response.data.message,
+        message: error.response.data.error,
       };
     } else {
       // Handle the case where error.response is undefined
@@ -148,7 +163,7 @@ export async function forgotPassword(prevState: any, formData: FormData): Promis
     const response = await axios.post(forgotPasswordUrl, data);
 
     return {
-      status: response.status,
+      status: response.data.statusCode,
       message: response.data.message,
     };
   } catch (error: any) {
@@ -232,4 +247,50 @@ export async function resetPassword(formData: any, token: string) {
     }
 
   }
+}
+
+export async function getUserDetails(){
+  console.log('inside user details');
+  try {
+    const userUrl = `${url}user`;
+
+    const response = await axios.get(userUrl)
+    console.log(response)
+    
+  } catch (error : any) {
+    // console.log(error);
+  }
+}
+
+export async function getShopDetails(){
+  try{
+    const shopUrl = `http://localhost:5000/shop`;
+
+    const response = await fetch(shopUrl,{
+      credentials: 'include',
+      cache: 'no-store'
+    });
+
+    console.log(response);
+    // if(response.status === 401 && response.statusText == 'Unauthorized'){
+    //   console.log('inside shop details');
+    //   const extendToken = await fetch(`${url}refresh-token`, {
+    //     method: 'POST',
+    //     headers:{
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({refreshToken: true}),
+    //     credentials: 'include',
+    //   })
+
+    //   console.log(extendToken)
+    // }
+
+  }catch(error: any){
+    // console.log(error);
+  }
+}
+
+async function refreshTokenRoute(){
+
 }
