@@ -5,7 +5,8 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  name: string;
+  name?: string;
+  role?: string;
 }
 
 interface UserState {
@@ -27,3 +28,5 @@ export const userStore = create<UserState>()(
         }
       )
 );
+
+export const useUserStore = () => userStore(userStore);

@@ -22,6 +22,7 @@ const SignUp:FC<Props> = ({action}: Props) => {
   const router = useRouter();
 
   useEffect(() => {
+    console.log(state);
     if (state.status === 200) {
       router.push("/login");
     }
@@ -30,37 +31,21 @@ const SignUp:FC<Props> = ({action}: Props) => {
   return (
     <form action={formAction} className="mt-2 grid grid-cols-6 gap-4">
       <div className="col-span-6">
-      
+
       {(state.message && state.status !== 200) && <ErrorMessage message={state.message} /> }
       </div>
-      <div className="col-span-6 sm:col-span-3">
+      <div className="col-span-6">
         <label
-          htmlFor="FirstName"
+          htmlFor="fullname"
           className="block text-sm font-medium text-gray-200"
         >
-          First Name
+          Full Name
         </label>
 
         <input
           type="text"
-          id="FirstName"
-          name="first_name"
-          className="mt-1 w-full rounded-md text-sm p-2 bg-inherit border border-l-zinc-50 focus:outline-lime-500"
-        />
-      </div>
-
-      <div className="col-span-6 sm:col-span-3">
-        <label
-          htmlFor="LastName"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-        >
-          Last Name
-        </label>
-
-        <input
-          type="text"
-          id="LastName"
-          name="last_name"
+          id="fullname"
+          name="fullname"
           className="mt-1 w-full rounded-md text-sm p-2 bg-inherit border border-l-zinc-50 focus:outline-lime-500"
         />
       </div>
@@ -109,22 +94,6 @@ const SignUp:FC<Props> = ({action}: Props) => {
           type="password"
           id="Password"
           name="password"
-          className="mt-1 w-full rounded-md text-sm p-2 bg-inherit border border-l-zinc-50 focus:outline-lime-500"
-        />
-      </div>
-
-      <div className="col-span-6">
-        <label
-          htmlFor="MobileNumber"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-        >
-          Mobile Number
-        </label>
-
-        <input
-          type="number"
-          id="MobileNumber"
-          name="mobileNo"
           className="mt-1 w-full rounded-md text-sm p-2 bg-inherit border border-l-zinc-50 focus:outline-lime-500"
         />
       </div>

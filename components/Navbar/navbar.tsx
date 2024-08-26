@@ -6,9 +6,9 @@ import LimeButton from "../Button/limeButton";
 import styles from "./navbar.module.css";
 import { FC, useState, useEffect } from "react";
 import NavItem from "./NavItem/navItem";
-import { userStore } from "@/store/user";
+import { User, userStore } from "@/store/user";
 import { Dropdown } from "../common/Dropdown";
-import { getUserDetails } from "@/api/auth";
+import { getUserDetailsFromToken } from "@/api/auth";
 
 const navInteractionIcons = {
   show: <Hamburger className={styles.navInteractionIcon} />,
@@ -24,6 +24,8 @@ type NavbarProps = {
   navItems: NavigationLink[];
 };
 
+
+
 export const Navbar: FC<NavbarProps> = ({
   navItems
 }) => {
@@ -32,23 +34,23 @@ export const Navbar: FC<NavbarProps> = ({
   const [isUser, setIsUser] = useState(user !== null);
   // console.log(navItems)
 
-  // useEffect(() => {
-  //   if (!user) {
-  //     // setLoading(true);
-  //     const setUserInNavbar = async () => {
-  //       try {
-  //         const userDetails = await getUserDetails();
-  //         // setUser(userDetails);
-  //       } catch (err) {
-  //         // setError(err.message);
-  //       } finally {
-  //         // setLoading(false);
-  //       }
-  //     };
+  useEffect(() => {
+    if (!user) {
+      // setLoading(true);
+      const setUserInNavbar = async () => {
+        try {
+          const userDetails = await getUserDetailsFromToken();
+          setUser(userDetails as User);
+        } catch (err) {
+          // setError(err.message);
+        } finally {
+          // setLoading(false);
+        }
+      };
 
-  //     setUserInNavbar();
-  //   }
-  // }, [user, setUser]);
+      setUserInNavbar();
+    }
+  }, [user, setUser]);
 
   return (
     <nav className={styles.container}>

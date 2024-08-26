@@ -2,22 +2,28 @@
 
 import axios from "axios";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { User } from "@/store/user";
+
+async function setCookie(name: string, value: string, maxage: number) {
+  cookies().set(name, value, { maxAge: maxage, httpOnly: true });
+}
 
 interface loginUser {
   username: string;
   password: string;
 }
 
-type UserResponse =  {
+type UserResponse = {
   id: number;
   username: string;
   email: string;
   name: string;
-}
+};
 
 interface signupUser {
   email: string;
-  name?: string;
+  fullname?: string;
   username: string;
   password: string;
   mobileNo?: string;
@@ -37,71 +43,100 @@ interface resetPassswordUser {
   confirmPassword: string;
 }
 
-const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5000', // Your API base URL
+export const axiosInstance = axios.create({
+  baseURL: "http://localhost:8080", // Your API base URL
   withCredentials: true, // Send cookies with requests
-	headers: {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+  headers: {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json",
+  },
 });
 
-const url = "http://localhost:5000/admin/";
+const url = "http://localhost:8080/user/";
 
-export async function login(prevState: any, formData: FormData): Promise<{status: number; message:string; user: UserResponse | null; }>{
-  const username: string = formData.get("email") as string;
+function checkInput(input: string) {
+  // Regular expression for validating an Email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Test if the input matches the email pattern
+  if (emailRegex.test(input)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export async function login(
+  prevState: any,
+  formData: FormData
+): Promise<{ status: number; message: string; user: UserResponse | null }> {
+  const username: string = formData.get("username") as string;
   const password: string = formData.get("password") as string;
 
   if (!username || !password) {
     return {
       status: 400,
       message: "Username/Email or Password cannot be empty",
-      user: null
+      user: null,
     };
   }
 
-  const data: loginUser = {
-    username: username,
-    password: password, // Consider using secure password hashing in production
-  };
+  let data = {};
+
+  if (await checkInput(username)) {
+    data = {
+      email: username,
+      password: password,
+    };
+  } else {
+    data = {
+      username: username,
+      password: password,
+    };
+  }
 
   try {
-    const response = await axiosInstance.post('/admin/login', data);
-    console.log(response.data.data.userdata)
+    const response = await axiosInstance.post("/user/login", data);
+
+    const token = response.data.data.tokens.token;
+    const refreshToken = response.data.data.tokens.refreshToken;
+
+    setCookie("token", token, 900);
+
+    setCookie("refreshToken", refreshToken, 86400);
 
     return {
       status: response.data.statusCode,
       message: response.data.message,
-      user : {
-        id : response.data.data.userdata.id,
-        username: response.data.data.userdata.username,
-        email: response.data.data.userdata.email,
-        name: response.data.data.userdata.name
-      }
-    }; 
-    
+      user: response.data.data.data,
+    };
   } catch (error: any) {
+    console.log(error);
     if (error.response) {
       return {
         status: error.response.status,
         message: error.response.data.message,
-        user: null
+        user: null,
       };
     } else {
       // Handle the case where error.response is undefined
       return {
         status: 500,
-        message: 'Server is not responding. Please try again later.',
-        user: null
+        message: "Server is not responding. Please try again later.",
+        user: null,
       };
     }
   }
 }
 
-export async function signup(prevState: any, formData: FormData): Promise<{status: number; message: string}> {
+export async function signup(
+  prevState: any,
+  formData: FormData
+): Promise<{ status: number; message: string }> {
   const email: string = formData.get("email") as string;
   const username: string = formData.get("username") as string;
   const password: string = formData.get("password") as string;
-  const first_name: string = formData.get("first_name") as string;
-  const last_name: string = formData.get("last_name") as string;
-  const mobileno: string = formData.get("mobileNo") as string;
+  const fullName: string = formData.get("fullname") as string;
 
   if (!email || !username || !password) {
     return {
@@ -115,13 +150,12 @@ export async function signup(prevState: any, formData: FormData): Promise<{statu
     email: email,
     username: username,
     password: password,
-    name: first_name + " " + last_name,
-    mobileNo: mobileno,
+    fullname: fullName,
   };
 
   try {
     const response = await axios.post(signupUrl, data);
-
+    console.log(response);
     return {
       status: response.data.statusCode,
       message: response.data.message,
@@ -130,20 +164,22 @@ export async function signup(prevState: any, formData: FormData): Promise<{statu
     if (error.response) {
       return {
         status: error.response.status,
-        message: error.response.data.error,
+        message: error.response.data.message,
       };
     } else {
       // Handle the case where error.response is undefined
       return {
-        status: 500, // or any default status code you prefer
-        message: 'Server is not responding. Please try again later.',
+        status: 500,
+        message: "Server is not responding. Please try again later.",
       };
     }
   }
-
 }
 
-export async function forgotPassword(prevState: any, formData: FormData): Promise<{status: number; message:string;}> {
+export async function forgotPassword(
+  prevState: any,
+  formData: FormData
+): Promise<{ status: number; message: string }> {
   const email: string = formData.get("email") as string;
 
   if (!email) {
@@ -176,7 +212,7 @@ export async function forgotPassword(prevState: any, formData: FormData): Promis
       // Handle the case where error.response is undefined
       return {
         status: 500,
-        message: 'Server is not responding. Please try again later.',
+        message: "Server is not responding. Please try again later.",
       };
     }
   }
@@ -231,7 +267,6 @@ export async function resetPassword(formData: any, token: string) {
       flag: true,
       data: response.data.message,
     };
-
   } catch (error: any) {
     if (error.response) {
       return {
@@ -242,33 +277,31 @@ export async function resetPassword(formData: any, token: string) {
       // Handle the case where error.response is undefined
       return {
         status: 500, // or any default status code you prefer
-        message: 'Server is not responding. Please try again later.',
+        message: "Server is not responding. Please try again later.",
       };
     }
-
   }
 }
 
-export async function getUserDetails(){
-  console.log('inside user details');
+export async function getUserDetails() {
+  console.log("inside user details");
   try {
     const userUrl = `${url}user`;
 
-    const response = await axios.get(userUrl)
-    console.log(response)
-    
-  } catch (error : any) {
+    const response = await axios.get(userUrl);
+    console.log(response);
+  } catch (error: any) {
     // console.log(error);
   }
 }
 
-export async function getShopDetails(){
-  try{
+export async function getShopDetails() {
+  try {
     const shopUrl = `http://localhost:5000/shop`;
 
-    const response = await fetch(shopUrl,{
-      credentials: 'include',
-      cache: 'no-store'
+    const response = await fetch(shopUrl, {
+      credentials: "include",
+      cache: "no-store",
     });
 
     console.log(response);
@@ -285,12 +318,78 @@ export async function getShopDetails(){
 
     //   console.log(extendToken)
     // }
-
-  }catch(error: any){
+  } catch (error: any) {
     // console.log(error);
   }
 }
 
-async function refreshTokenRoute(){
+export async function renewAccessToken(refreshToken: string){
+  try{
+   const response = await fetch("http://localhost:8080/user/refreshToken", {
+     method: "POST",
+     headers: {
+       "Content-Type": "application/json",
+       Authorization: `Bearer ${refreshToken}`,
+     },
+   });
 
+   const result = await response.json();
+
+   // setting cookies again..
+   await setCookie('token', result.data.tokens.token, 900);
+   await setCookie(
+     "refreshToken",
+     result.data.tokens.refreshToken,
+     86400
+   );
+
+   return result.data;
+
+  }catch(error){
+    console.log(error);
+  }
+}
+
+export async function getUserDetailsFromToken() {
+  const token = cookies().get("token")?.value;
+  const refreshToken = cookies().get("refreshToken")?.value;
+  let user = null;
+
+  if (!token && !refreshToken) {
+    return user;
+  } else if (!token && refreshToken) {
+    // generate tokens again and return user...
+    const allData = await renewAccessToken(refreshToken);
+    user = allData.data;
+
+    return user;
+
+  } else if (token && refreshToken) {
+    const response = await fetch("http://localhost:8080/user/getTokenDetails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    const result = await response.json();
+    
+    user = {
+      id: result.data.id,
+      username: result.data.username,
+      email: result.data.username,
+      role: result.data.role
+    }
+
+    return user as User;
+  }
+
+  return user;
+}
+
+export async function logout(){
+  cookies().delete('token')
+  cookies().delete('refreshToken')
+  
 }
